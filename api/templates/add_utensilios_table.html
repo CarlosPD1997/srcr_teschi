@@ -1,0 +1,21 @@
+{% if page_obj %}
+            {% for utensilio in page_obj %}
+                <tr>
+                    <td id="utensilio-id">{{ utensilio.id }}</td>
+                    <td>{{ utensilio.nombre }}</td>
+                    <td class="cantidad">{{ utensilio.cantidad }}</td>
+                    <td>{{ utensilio.descripcion }}</td>
+                    <td>{{ utensilio.tamaño }}</td>
+                    <td><img src="{{ utensilio.img.url }}" alt="Imagen de {{ utensilio.nombre }}" style="width: 50px; height: auto;"></td>
+                    <td><button type="button" class="btn btn-success mb-3 add-item" id="add-item">Agregar</button></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No se encontraron utensilios.</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6">No se encontraron utensilios.</td>
+            </tr>
+        {% endif %}
