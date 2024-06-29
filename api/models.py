@@ -3,23 +3,27 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 import os 
 class Semester(models.Model):
+    id = models.AutoField(primary_key=True)
     semester = models.CharField(max_length=30)
 
 class Classes(models.Model):
+    id = models.AutoField(primary_key=True)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
 class Users(AbstractUser):
+    id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=False)
     profile_photo = models.ImageField(upload_to='img/', default='img/profile.jpg')
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, default=1)
-    grupo = models.CharField(max_length=20, default=0)
+    grupo = models.CharField(max_length=20, default='0')
 
 # Ajustando related_name para evitar conflictos
 Users.groups.field.remote_field.related_name = 'users_groups'
 Users.user_permissions.field.remote_field.related_name = 'users_permissions'
 
 class requisicion(models.Model):
+    id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=10)
     asignatura = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True)
     hora_inicio = models.CharField(max_length=100)
@@ -31,6 +35,7 @@ class requisicion(models.Model):
     created_date = models.DateField(auto_now_add=True)
 
 class utensilios(models.Model):
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
     cantidad = models.IntegerField()
     descripcion = models.CharField(max_length=200)

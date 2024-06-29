@@ -4,6 +4,10 @@ from django.forms import ValidationError
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
+from django.template.loader import render_to_string
+from srcr import settings
 
 # Create your views here.
 class SignUp(APIView):
@@ -44,8 +48,12 @@ class SignUp(APIView):
             user.full_clean()  
             user.save()
             print("registrado")
-            messages.success(request, 'Cuenta registrada exitosamente. Por favor, inicia sesión.')
-
+            subject = 'Bienvenido a nuestro sitio'
+            html_message = render_to_string('registration_email.html', {'user': user})
+            plain_message = strip_tags(html_message)  # Eliminar etiquetas HTML para clientes de correo que no admiten HTML
+            from_email = settings.EMAIL_HOST_USER
+            to_email = [email]
+            send_mail(subject, plain_message, from_email, to_email, html_message=html_message)
             return redirect('login')  # Redirige a la página de inicio de sesión
         except Exception as e:
             print("Fallo", e)

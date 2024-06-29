@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login as auth_login
-from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.decorators import method_decorator
@@ -17,10 +15,12 @@ class Login(APIView):
                                  {'form': AuthenticationForm()})
     
     def post(self, request):
-        username = request.POST['username']
+        username = request.POST['username']  # Asumiendo que 'username' es el campo de correo electrónico
         password = request.POST['password']
+        
         print(f"Autenticando usuario: {username} con contraseña: {password}")
         
+        # Intentar autenticar al usuario por correo electrónico
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
@@ -29,5 +29,5 @@ class Login(APIView):
             return redirect('index')
         else:
             print("Autenticación fallida")
-            messages.error(request, 'Usuario no encontrado')
+            messages.error(request, 'Usuario no encontrado o credenciales inválidas')
             return render(request, 'login.html', {'form': AuthenticationForm()})
