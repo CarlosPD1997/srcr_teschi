@@ -26,7 +26,7 @@ urlpatterns = [
     path('cerrar_sesion/', LogoutView.as_view(), name='salir'),
     path('informacion_usuario/', info.as_view(), name='info'),
     path('descargar_requisicion/<int:id>/', descargar_requisicion, name='descargar_requisicion'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
