@@ -13,6 +13,6 @@ def buscar_view(request):
             }
             return redirect('editar', id=objeto.id)
         except requisicion.DoesNotExist:
-            return render(request, 'requisicion.html', {'error': 'ID no encontrado'})
-    return render(request, 'requisicion.html')
+            return render(request, 'Requisicion.html', {'error': 'ID no encontrado'})
+    return render(request, 'Requisicion.html')
 
