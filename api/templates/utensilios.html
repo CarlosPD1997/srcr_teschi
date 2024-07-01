@@ -44,6 +44,19 @@
             justify-content: center;
             align-items: center;
         }
+        .nav-item ul {
+            display: none; /* Ocultar submenús por defecto */
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .nav-item.active > ul {
+            display: block; /* Mostrar submenú cuando el elemento está activo */
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -69,22 +82,39 @@
                 Herramientas
             </div>
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'index' %}">
-                    <i class="fas fa-fw fa-receipt"></i>
-                    <span>Requisición</span></a>
-            </li>
-            <li class="nav-item ">
-                <a class="nav-link" href="{% url 'requisicion' %}">
-                    <i class="fas fa-fw fa-file-pdf"></i>
-                    <span>Editar Requisición</span></a>
-            </li>
-            <li class="nav-item ">
-                <a class="nav-link" href="{% url 'history' %}">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>Historial</span></a>
-            </li>
-
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link" id="toggle-menu" href="#">
+                        <i class="fas fa-fw fa-receipt"></i>
+                        <span>Utensilios</span>
+                    </a>
+                    <ul>
+                        <li>
+                            <a class="nav-link" href="{% url 'utensilios' %}">
+                                <i class="fas fa-fw fa-plus"></i>
+                                <span>Administrar Utensilios</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="{% url 'requisicion' %}">
+                        <i class="fas fa-fw fa-file-pdf"></i>
+                        <span>Ver usuarios</span></a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="{% url 'history' %}">
+                        <i class="fas fa-fw fa-folder"></i>
+                        <span>Historial</span></a>
+                </li>
+            </ul>
+            <script>
+                document.getElementById('toggle-menu').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const navItem = this.parentElement;
+                    navItem.classList.toggle('active');
+                });
+            </script>
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -157,7 +187,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-12 col-md-10">
                                         <h1 class="h3 mb-4 text-gray-800 text-center">Administrar utensilios</h1>
-                                        <form class="user" method="POST" action="{% url 'utensilios' %}">
+                                        <form class="user" method="POST"  id="utensilio" enctype="multipart/form-data">
                                             {% csrf_token %}
                                             <div class="table-responsive">
                                                 <table class="table table-form">
@@ -167,6 +197,7 @@
                                                             <th>Cantidad</th>
                                                             <th>Descripción</th>
                                                             <th>Tamaño</th>
+                                                            <th>Imagen</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -184,6 +215,7 @@
                                                             <td><input type="text"
                                                                     class="form-control-lg form-control-user"
                                                                     name="tamaño" placeholder="Tamaño"></td>
+                                                            <td> <input type="file" id="img" name="img" required></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -209,12 +241,36 @@
                                                         <th>Cantidad</th>
                                                         <th>Descripción</th>
                                                         <th>Tamaño</th>
+                                                        <th>Imagen</th>
+                                                        <th>Editar</th>
+                                                        <th>Eliminar</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="utensilios-list">
-                                                    {% include 'add_utensilios_table.html' %}
+                                                    {% include 'utensilios_table.html' %}
                                                 </tbody>
                                             </table>
+                                            <div>
+                                                <ul class="pagination align-items-center justify-content-center" style="display: flex; list-style-type: none;">
+                                                    {% if page_obj.has_previous %}
+                                                        <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page=1">&laquo; << </a></li>
+                                                        <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}">&lsaquo; < </a></li>
+                                                    {% endif %}
+                                            
+                                                    {% for num in page_obj.paginator.page_range %}
+                                                        {% if page_obj.number == num %}
+                                                            <li style="margin-right: 5px;" class="active"><span>{{ num }}</span></li>
+                                                        {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                                                            <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ num }}">{{ num }}</a></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                            
+                                                    {% if page_obj.has_next %}
+                                                        <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ page_obj.next_page_number }}"> > &rsaquo;</a></li>
+                                                        <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}"> >> &raquo;</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
                                         </div>
 
                                     </div>
@@ -226,7 +282,8 @@
                     <!-- /.container-fluid -->
                 </div>
                 <!-- End of Main Content -->
-
+                
+               
                 <!-- Footer -->
                 <footer class="sticky-footer bg-white">
                     <div class="container my-auto">

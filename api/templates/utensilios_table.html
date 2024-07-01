@@ -1,24 +1,27 @@
-<!-- utensilios_table.html -->
-{% if utensilios_list %}
-    {% for utensilio in utensilios_list %}
-    <tr>
-        <td>{{ utensilio.nombre }}</td>
-        <td id="cantidad">{{ utensilio.cantidad }}</td>
-        <td>{{ utensilio.descripcion }}</td>
-        <td>{{ utensilio.tamaño }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">No se encontraron utensilios.</td>
-    </tr>
-    {% endfor %}
-{% else %}
-    {% for utensilio in utensilios_list %}
-    <tr>
-        <td>{{ utensilio.nombre }}</td>
-        <td>{{ utensilio.cantidad }}</td>
-        <td>{{ utensilio.descripcion }}</td>
-        <td>{{ utensilio.tamaño }}</td>
-    </tr>
-    {% endfor %}
-{% endif %}
+{% if page_obj %}
+            {% for utensilio in page_obj %}
+                <tr>
+                    <td>{{ utensilio.nombre }}</td>
+                    <td class="cantidad">{{ utensilio.cantidad }}</td>
+                    <td>{{ utensilio.descripcion }}</td>
+                    <td>{{ utensilio.tamaño }}</td>
+                    <td><img src="{{ utensilio.img.url }}" alt="Imagen de {{ utensilio.nombre }}" style="width: 50px; height: auto;"></td>
+                    <td><a href="{% url 'editar_utensilio' utensilio.id %}" class="btn btn-success">Editar</a></td>
+            <td>
+                <form method="POST" action="{% url 'delete' utensilio.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No se encontraron utensilios.</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6">No se encontraron utensilios.</td>
+            </tr>
+        {% endif %}
+       

@@ -206,8 +206,22 @@
                                                             </td>
                                                             <td><input type="date"
                                                                     class="form-control-lg form-control-user"
-                                                                    placeholder="Fin" name="fecha">
+                                                                     name="fecha" id="id_fecha">
                                                             </td>
+                                                            <script>
+                                                                document.querySelector('form').addEventListener('submit', function(event) {
+                                                                    var fechaInput = document.getElementById('id_fecha').value;
+                                                                    var fechaSeleccionada = new Date(fechaInput);
+                                                                    var fechaMinima = new Date();
+                                                                    fechaMinima.setDate(fechaMinima.getDate() + 2); // Fecha mínima dos días en el futuro
+                                                            
+                                                                    // Comparar fechas
+                                                                    if (fechaSeleccionada <= fechaMinima) {
+                                                                        $.notify("Debes generar tu requisición con dos días de anticipación.", "error");
+                                                                        event.preventDefault();
+                                                                    }
+                                                                });
+                                                            </script>
                                                             <td><input type="time"
                                                                     class="form-control-lg form-control-user"
                                                                     placeholder="Fin" name="fin" value="8isc11"></td>
