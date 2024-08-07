@@ -5,10 +5,15 @@
                     <td class="cantidad">{{ utensilio.cantidad }}</td>
                     <td>{{ utensilio.descripcion }}</td>
                     <td>{{ utensilio.tamaño }}</td>
-                    <td><img src="{{ utensilio.img.url }}" alt="Imagen de {{ utensilio.nombre }}" style="width: 50px; height: auto;"></td>
+                    {% if utensilio.img %}
+                        <td><img src="{{ utensilio.img.url }}" alt="Imagen de {{ utensilio.nombre }}" style="width: 100px; height: auto;"></td>
+                    {% else %}
+                        <td><p>No hay imgen para mostrar</p></td>
+                    
+                    {% endif %}
                     <td><a href="{% url 'editar_utensilio' utensilio.id %}" class="btn btn-success">Editar</a></td>
             <td>
-                <form method="POST" action="{% url 'delete' utensilio.id %}" style="display:inline;">
+                <form method="POST" action="{% url 'eliminar_utensilio' utensilio.id %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Eliminar</button>
                 </form>

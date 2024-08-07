@@ -137,7 +137,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.first_name }} {{ user.last_name }} {{ user.profile_photo.url }}</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.first_name }} {{ user.last_name }} </span>
                                 <img class="img-profile rounded-circle" src="{{ user.profile_photo.url }}">
                                 
                             </a>
@@ -179,11 +179,10 @@
                                         <img class="img-profile rounded-circle custom-img-size" src="{{ user.profile_photo.url }}">
                                         <br><p></p>
                                         <h3>Foto de usuario</h3>
-                                        <button class="btn btn-success btn-user btn-sm">Guardar cambios</button>
-                                        <br><p></p>
-                                        <form class="user" method="POST" action="{% url 'login' %}">
+                                        <form class="user" method="POST" enctype="multipart/form-data">
                                             {% csrf_token %}
-                                            
+                                            <input type="file" id="img" name="profile_photo" class="btn btn-success" accept="image/*">
+                                            <br> <p></p>
                                             <div class="table-responsive">
                                                 <table class="table table-form">
                                                     <thead>
@@ -198,7 +197,7 @@
                                                             <td>
                                                                 <input type="text"
                                                                     class="form-control form-control-user"
-                                                                    placeholder="{{ user.first_name }}" name="utensilios"
+                                                                    value="{{ form.first_name.value }}" name="first_name"
                                                                     >
                                                             </td>
                                                         </tr>
@@ -207,7 +206,7 @@
                                                             <td>
                                                                 <input type="text"
                                                                     class="form-control form-control-user"
-                                                                    placeholder="{{ user.last_name }}" name="utensilios"
+                                                                    value="{{ form.last_name.value }}" name="last_name"
                                                                     >
                                                             </td>
                                                         </tr>
@@ -216,7 +215,7 @@
                                                             <td>
                                                                 <input type="text"
                                                                     class="form-control form-control-user"
-                                                                    placeholder="{{ user.semester.semester }}" name="utensilios"
+                                                                    value="{{ form.semester.semester.value }}" name="semester"
                                                                     >
                                                             </td>
                                                         </tr>
@@ -225,7 +224,7 @@
                                                             <td>
                                                                 <input type="text"
                                                                     class="form-control form-control-user"
-                                                                    placeholder="{{ user.grupo }}" name="utensilios"
+                                                                    placeholder="{{ form.grupo.value }}" name="grupo"
                                                                     >
                                                             </td>
                                                         </tr>
@@ -234,7 +233,7 @@
                                                             <td>
                                                                 <input type="text"
                                                                     class="form-control form-control-user"
-                                                                    placeholder="{{ user.email }}" name="utensilios"
+                                                                    value="{{ form.email.value }}" name="email"
                                                                     >
                                                             </td>
                                                         </tr>
@@ -244,7 +243,7 @@
                                                         <!-- Agrega más filas según sea necesario -->
                                                     </tbody>
                                                 </table>
-                                                <button class="btn btn-success btn-user-lg btn-block mt-3">Actualizar datos</button>
+                                                <button class="btn btn-success btn-user-lg btn-block mt-3" type="submit">Actualizar datos</button>
                                             </div>
                                         </form>
 

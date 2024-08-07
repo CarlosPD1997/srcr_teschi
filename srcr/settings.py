@@ -77,16 +77,22 @@ WSGI_APPLICATION = 'srcr.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'srcr_teschi',                      # Nombre de la base de datos
-        'USER': 'srcr_teschi_user',                 # Usuario de la base de datos
-        'PASSWORD': 'GTPrUTlATKy4OEoNw89iv46fnRIk1C7p',  # Contraseña del usuario
-        'HOST': 'dpg-cq07d2iju9rs73api2c0-a.oregon-postgres.render.com',  # Host del servidor PostgreSQL
-        'PORT': '',                                 # Puerto (puede dejarlo en blanco si usa el puerto predeterminado)
+        'NAME': 'srcr_teschi2',                      # Nombre de la base de datos
+        'USER': 'srcr_teschi2_user',                 # Usuario de la base de datos
+        'PASSWORD': 'Fv8Cm1FvcI5tVL7XivUSMvcQIlqqwhKb',  # Contraseña del usuario
+        'HOST': 'dpg-cqks5sjqf0us73boo0h0-a.oregon-postgres.render.com',  # Host del servidor PostgreSQL
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',  # Asegúrate de incluir esta línea
+        },
     }
 }
+
+
 
 
 
@@ -121,6 +127,7 @@ USE_I18N = True
 USE_TZ = True
 
 AUTH_USER_MODEL = 'api.Users'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -129,6 +136,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Midea Files
 MEDIA_URL = '/media/'
@@ -141,8 +150,8 @@ EMAIL_USE_TLS = True  # Habilita TLS para cifrado
 EMAIL_USE_SSL = False  # Usualmente falso cuando se usa TLS
 
 # Credenciales de acceso al correo electrónico
-EMAIL_HOST_USER = 'tu_correo@gmail.com'  # Cambia por tu dirección de correo
-EMAIL_HOST_PASSWORD = 'tu_contraseña'  # Cambia por la contraseña de tu correo
+EMAIL_HOST_USER = 'almacenteschi2024@gmail.com'  # Cambia por tu dirección de correo
+EMAIL_HOST_PASSWORD = 'dzujpwwowxtligcn' 
 
 # Configuración adicional para el envío de correos electrónicos
-DEFAULT_FROM_EMAIL = 'tu_correo@gmail.com'  # Dirección de correo que se usará como remitente por defecto
+DEFAULT_FROM_EMAIL = 'almacenteschi2024@gmail.com'  # Dirección de correo que se usará como remitente por defecto

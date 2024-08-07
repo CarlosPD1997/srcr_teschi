@@ -1,74 +1,62 @@
-from rest_framework.views import APIView
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
 from reportlab.lib.pagesizes import letter, landscape
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib import colors
 from datetime import datetime
-from django.contrib.staticfiles import finders
-from reportlab.lib.units import inch
-from reportlab.platypus import Frame
 from api.models import requisicion
 from django.contrib import messages
 import io
-import uuid
 from django.core.files.base import ContentFile
-import base64
+from .codigo import generar_codigo_unico
 from api.models import utensilios
 from django.core.paginator import Paginator
+from django.urls import reverse
+from django.http import  HttpResponseRedirect
+from rest_framework.views import APIView
+from django.shortcuts import render
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from reportlab.lib import colors
+from django.core.files.base import ContentFile
+from django.core.mail import EmailMessage  # Importa EmailMessage para enviar correos
+from django.contrib import messages
+from api.models import requisicion, utensilios
+import io
+from django.conf import settings
+
+from rest_framework.views import APIView
+from django.shortcuts import render
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+from reportlab.lib import colors
+from django.core.files.base import ContentFile
+from django.core.mail import send_mail  # Importa send_mail
 from django.template.loader import render_to_string
-
-
-# Create your views here.
-def generar_codigo_unico():
-        random_uuid = uuid.uuid4()
-    
-        # Convertir el UUID a bytes
-        uuid_bytes = random_uuid.bytes
-        
-        # Codificar en Base64 y obtener una cadena
-        base64_uuid = base64.urlsafe_b64encode(uuid_bytes).decode('utf-8')
-        
-        # Tomar los primeros 8 caracteres
-        codigo_corto = base64_uuid[:8]
-        
-        return codigo_corto
+from django.contrib import messages
+from api.models import requisicion, utensilios
+import io
 
 class Index(APIView):
-    template_name="index.html"
+    template_name = "index.html"
+
     def get(self, request):
-        usuario = request.user
         utensilios_list = utensilios.objects.all()
-        search_query = request.GET.get('search', '')  # Obtén el término de búsqueda del parámetro GET
+        search_query = request.GET.get('search', '')
         
-        # Filtra los utensilios basados en el término de búsqueda si existe
         if search_query:
             utensilios_list = utensilios.objects.filter(nombre__icontains=search_query)
-        else:
-            utensilios_list = utensilios.objects.all()  # Obtén todos los utensilios si no hay término de búsqueda
-
-        paginator = Paginator(utensilios_list, 12)  # Mostrar 10 utensilios por página
+        
+        paginator = Paginator(utensilios_list, 12)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        usuario_data = {
-                'username': usuario.username,
-                'email': usuario.email,
-                'photo': usuario.profile_photo,
-                'name': usuario.first_name
-                # Agrega otros campos que quieras incluir
-            }
-        
-        
-        return render(request, self.template_name,  {'usuario': usuario_data,
-                                                      'page_obj': page_obj,
-                                                        'search_query': search_query 
+
+        return render(request, self.template_name, {
+            'page_obj': page_obj,
+            'search_query': search_query 
         })
     
-    
-    
-    def post(self,request):
+    def post(self, request):
         try:
             user = request.user
             grupo = request.POST.get('grupo')
@@ -85,29 +73,36 @@ class Index(APIView):
                     parts = key.split('[')
                     index = int(parts[1][:-1])
                     field = parts[2][:-1]
+
                     while len(utensilios) <= index:
                         utensilios.append({})
-                    utensilios[index][field] = value
-            utensilios = [[u['nombre'], u['cantidad']] for u in utensilios if 'nombre' in u and 'cantidad' in u]
-            print(utensilios)
-            fecha_actual = datetime.now().strftime('%Y-%m-%d')
 
-            # Crear el PDF en memoria
+                    utensilios[index][field] = value
+
+            utensilios_finales = [
+                {
+                    'id': u.get('id', ''),
+                    'nombre': u.get('nombre', ''),
+                    'cantidad_maxima': u.get('cantidad_maxima', ''),
+                    'cantidad': u.get('cantidad', '')
+                }
+                for u in utensilios if 'nombre' in u and 'cantidad' in u
+            ]
+
+            # Generación del PDF
             buffer = io.BytesIO()
-            doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
             elements = []
 
-            # Título y datos del encabezado
-            title = "2024. Año del Bicentenario de la Erección del Estado Libre y Soberano de México"
             header_data = [
-                ["PRÁCTICAS DE LOS TALLERES DE LA LICENCIATURA EN GASTRONOMÍA "],
-                ["FECHA:", fecha_actual, "GRUPO:", grupo],
+                ["PRÁCTICAS DE LOS TALLERES DE LA LICENCIATURA EN GASTRONOMÍA"],
+                ["FECHA:", fecha, "GRUPO:", grupo],
                 ["HORA DE INICIO:", inicio, "HORA DE TÉRMINO:", fin],
                 ["DOCENTE:", docente, "ASIGNATURA:", asignatura],
                 ["TALLER:", taller, "", ""]
             ]
 
-            header_table = Table(header_data, colWidths=[150, 200, 150, 200])
+            header_table = Table(header_data, colWidths=[150, 150, 150, 150])
             header_table.setStyle(TableStyle([
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
                 ('SPAN', (0, 0), (-1, 0)),
@@ -122,12 +117,14 @@ class Index(APIView):
             elements.append(header_table)
             elements.append(Spacer(1, 20))
 
-            # Agregar la tabla de utensilios
             utensilios_data = [
-                ["NOMBRE \n DE \n UTENSILIOS", "CANTIDAD \n REQUERIDA \n  POR EL \n ESTUDIANTE", "CANTIDAD \n ENTREGADA \n POR EL ALMACÉN", "CANTIDAD \n RECIBIDA \n POR \n ENCARGADO \n DEL \n ALMACÉN Y \n ENCARGADO \n DE ÁREA"],
+                ["NOMBRE \n DE \n UTENSILIOS", 
+                 "CANTIDAD \n REQUERIDA \n  POR EL \n ESTUDIANTE", 
+                 "CANTIDAD \n ENTREGADA \n POR EL ALMACÉN", 
+                 "CANTIDAD \n RECIBIDA \n POR \n ENCARGADO \n DEL \n ALMACÉN Y \n ENCARGADO \n DE ÁREA"],
             ]
-            for utensilio in utensilios:
-                utensilios_data.append([utensilio[0], utensilio[1], "", ""])
+            for utensilio in utensilios_finales:
+                utensilios_data.append([utensilio['nombre'], utensilio['cantidad'], "", ""])
 
             utensilios_table = Table(utensilios_data, colWidths=[150, 100, 100, 100])
             utensilios_table.setStyle(TableStyle([
@@ -136,13 +133,12 @@ class Index(APIView):
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
                 ('GRID', (0, 0), (-1, -1), 1, colors.black),
             ]))
             elements.append(utensilios_table)
 
-            # Añadir la tabla de firma
             firma_data = [
                 ["__________________ \n FIRMA DE ALMACÉN"]
             ]
@@ -161,32 +157,49 @@ class Index(APIView):
             buffer.seek(0)
             pdf_content = buffer.getvalue()
 
-            # Guardar el PDF en un archivo temporal
-            temp_file = ContentFile(pdf_content)
-            temp_file_name = f"Requisicion_{fecha_actual}.pdf"
-            codigo_unico = generar_codigo_unico()  # Asegúrate de que esta función está definida
+            # Preparar el correo
+            subject = 'Requisición de Utensilios'
+            html_message = render_to_string('requisicion_email.html', {'user': user})
+            plain_message = 'Adjunto encontrarás el PDF de la requisición de utensilios que solicitaste.'  # Mensaje de texto plano
+            from_email = settings.EMAIL_HOST_USER
+            to_email = ['almacenteschi2024@gmail.com']
 
-            # Crear el objeto Requisicion y guardar el PDF en el campo FileField
+            # Crear el EmailMessage para enviar el correo con el PDF adjunto
+            email = EmailMessage(
+                subject,
+                plain_message,
+                from_email,
+                to_email,
+            )
+            email.attach(f'Requisicion_{fecha}.pdf', pdf_content, 'application/pdf')
+            email.html_message = html_message  # Establece el mensaje HTML
+
+            # Enviar el correo
+            email.send(fail_silently=False)
+
+            # Guarda el PDF en el modelo si es necesario
+            temp_file = ContentFile(pdf_content)
+            temp_file_name = f"Requisicion_{fecha}.pdf"
+            codigo_unico = generar_codigo_unico()
+
             oficio = requisicion.objects.create(
                 codigo=codigo_unico,
                 hora_inicio=inicio,
                 hora_fin=fin,
                 grupo=grupo,
                 pdf=temp_file,
-                created_date=fecha_actual,
-                docente=docente
+                created_date=fecha,
+                docente=docente,
+                items=utensilios_finales,
             )
             oficio.users.add(user)
-            # Guardar el archivo en el FileField
             oficio.pdf.save(temp_file_name, temp_file)
 
-            # Retornar el archivo PDF como respuesta
-            response = HttpResponse(pdf_content, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename={temp_file_name}'
-            return response
+            # Redirigir a la página de creación de invoices
+            invoice_url = reverse('index')  # Asegúrate de que esta URL está definida en tu proyecto
+            return HttpResponseRedirect(invoice_url)
 
         except Exception as e:
             print(f'Error al generar el PDF: {str(e)}')
             messages.error(request, f'Error al generar el PDF: {str(e)}')
             return render(request, '404.html')
-    

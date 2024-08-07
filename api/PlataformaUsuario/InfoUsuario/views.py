@@ -1,18 +1,34 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 from rest_framework.views import APIView
+from api.models import Users
+from django import forms
 
-# Create your views here.
+class UserForm(forms.ModelForm):
+    profile_photo = forms.ImageField(label="usuario", required=False, widget=forms.FileInput(attrs={'class': 'user'}))
+    
+    class Meta:
+        model = Users
+        fields = ['first_name', 
+                  'last_name', 
+                  'email', 
+                  'profile_photo', 
+                  
+                  'grupo'
+                  ]
+
 class info(APIView):
-    template_name="info_usuario.html"
+    template_name = "info_usuario.html"
+    
     def get(self, request):
         usuario = request.user
-        usuario_data = {
-                'username': usuario.username,
-                'email': usuario.email,
-                'profile_photo': usuario.profile_photo,
-                'name': usuario.first_name,
-                'grupo': usuario.grupo,
-                'semester': usuario.semester,
-            }
-        
-        return render(request, self.template_name,  {'usuario': usuario_data})
+        form = UserForm(instance=usuario)
+        return render(request, self.template_name, {'form': form})
+    
+    def post(self, request):
+        usuario = request.user
+        form = UserForm(request.POST, request.FILES, instance=usuario)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.save()
+            return redirect('info')  # Asegúrate de que esta URL esté definida correctamente
+        return render(request, self.template_name, {'form': form})

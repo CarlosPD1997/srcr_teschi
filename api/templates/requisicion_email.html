@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Requisición de Utensilios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1f7a45;
+        }
+        p {
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Requisición de Utensilios</h1>
+        <p>Por parte del usuario: {{ user.first_name }} {{ user.last_name }},</p>
+        <p>Adjunto encontrarás el PDF de la requisición de utensilios que necesito.</p>
+        <p>Si tienes alguna pregunta, no dudes en contactarme.</p>
+        <p>¡Gracias!</p>
+    </div>
+</body>
+</html>

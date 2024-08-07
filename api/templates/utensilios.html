@@ -20,6 +20,7 @@
 
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/colors_messages.css' %}" rel="stylesheet">
     <style>
         .table-form {
             width: 100%;
@@ -57,6 +58,19 @@
         .nav-link {
             cursor: pointer;
         }
+        .nav-item ul {
+            display: none; /* Ocultar submenús por defecto */
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .nav-item.active > ul {
+            display: block; /* Mostrar submenú cuando el elemento está activo */
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -69,11 +83,11 @@
         <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'index' %}">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'utensilios' %}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <img src="{% static '/img/libelula.png' %}" style="height: 50px;" />
                 </div>
-                <div class="sidebar-brand-text mx-3">SRCR Teschi </div>
+                <div class="sidebar-brand-text mx-3">SRCR ADMIN </div>
             </a>
 
             <!-- Divider -->
@@ -90,20 +104,26 @@
                     </a>
                     <ul>
                         <li>
-                            <a class="nav-link" href="{% url 'utensilios' %}">
+                            <a class="nav-link active" href="{% url 'utensilios' %}">
                                 <i class="fas fa-fw fa-plus"></i>
                                 <span>Administrar Utensilios</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item ">
-                    <a class="nav-link" href="{% url 'requisicion' %}">
-                        <i class="fas fa-fw fa-file-pdf"></i>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios' %}">
+                        <i class="fas fa-fw fa-user"></i>
                         <span>Ver usuarios</span></a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'add_usuarios' %}">
+                        <i class="fas fa-fw fa-user"></i>
+                        <span>Agregar usuarios</span></a>
+                </li>
                 <li class="nav-item ">
-                    <a class="nav-link" href="{% url 'history' %}">
+                    <a class="nav-link" href="{% url 'HistoryAdmn' %}">
                         <i class="fas fa-fw fa-folder"></i>
                         <span>Historial</span></a>
                 </li>
@@ -157,12 +177,12 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.first_name }} {{ user.last_name }}</span>
-                                <img class="img-profile rounded-circle" src="{% static '/img/profile.jpg' %}">
+                                <img class="img-profile rounded-circle" src="{{ user.profile_photo.url }}">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{% url 'info' %}">
+                                <a class="dropdown-item" href="{% url 'adminfo' %}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Actualizar datos
                                 </a>
@@ -187,6 +207,13 @@
                                 <div class="row justify-content-center">
                                     <div class="col-12 col-md-10">
                                         <h1 class="h3 mb-4 text-gray-800 text-center">Administrar utensilios</h1>
+                                        <div class="messages">
+                                            {% for message in messages %}
+                                                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
                                         <form class="user" method="POST"  id="utensilio" enctype="multipart/form-data">
                                             {% csrf_token %}
                                             <div class="table-responsive">
@@ -215,7 +242,7 @@
                                                             <td><input type="text"
                                                                     class="form-control-lg form-control-user"
                                                                     name="tamaño" placeholder="Tamaño"></td>
-                                                            <td> <input type="file" id="img" name="img" required></td>
+                                                            <td> <input type="file" id="img" name="img"></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -343,6 +370,14 @@
         <script src="{% static 'js/aumentarValor.js' %}"></script>
 
         <!-- Your custom script -->
+        <script>
+            setTimeout(function() {
+                const messages = document.querySelector('.messages');
+                if (messages) {
+                    messages.style.display = 'none';
+                }
+            }, 5000); // Ocultar mensajes después de 5 segundos
+        </script>
         <script>
             $(document).ready(function () {
                 $('#search').on('input', function () {

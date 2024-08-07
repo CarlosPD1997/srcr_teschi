@@ -1,21 +1,19 @@
-import datetime
-from api.models import Users, Semester
-from django.forms import ValidationError
-from django.shortcuts import render, redirect
-from rest_framework.views import APIView
-from django.contrib import messages
+from django.conf import settings
 from django.core.mail import send_mail
-from django.utils.html import strip_tags
 from django.template.loader import render_to_string
-from srcr import settings
+from django.utils.html import strip_tags
+from rest_framework.views import APIView
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from api.models import Users, Semester  # Asegúrate de importar tu modelo de usuarios y semestres
 
-# Create your views here.
 class SignUp(APIView):
-    template_name="register.html"
+    template_name = "register.html"
+
     def get(self, request):
         semestre = Semester.objects.all()
         return render(request, self.template_name, {'semestres': semestre})
-    
+
     def post(self, request):
         name = request.POST['FirstName']
         lastName = request.POST['LastName']
@@ -48,15 +46,31 @@ class SignUp(APIView):
             user.full_clean()  
             user.save()
             print("registrado")
-            subject = 'Bienvenido a nuestro sitio'
-            html_message = render_to_string('registration_email.html', {'user': user})
-            plain_message = strip_tags(html_message)  # Eliminar etiquetas HTML para clientes de correo que no admiten HTML
+
+            # Configuración del correo electrónico
+            subject = 'Bienvenido!'
+            html_message = render_to_string('registration_email.html', 
+                                            {'user': user,
+                                             'password': password})
+            plain_message = strip_tags(html_message)  # Elimina etiquetas HTML para clientes de correo que no admiten HTML
             from_email = settings.EMAIL_HOST_USER
             to_email = [email]
-            send_mail(subject, plain_message, from_email, to_email, html_message=html_message)
-            return redirect('login')  # Redirige a la página de inicio de sesión
+
+            # Envío del correo
+            send_mail(
+                subject,
+                plain_message,
+                from_email,
+                to_email,
+                html_message=html_message,
+                fail_silently=False  # Cambia esto a True si no quieres que se lance una excepción al fallar el envío
+            )
+
+            # Mensaje de éxito
+            messages.success(request, 'Registro exitoso. Revisa tu correo para más detalles.')
+            return render(request, 'register.html')
+
         except Exception as e:
             print("Fallo", e)
-            messages.error(request, f'Error al registrar la cuenta: {str(e)}')
+            messages.error(request, f'Error al registrar la cuenta')
             return render(request, 'register.html')
-  

@@ -21,7 +21,8 @@
 
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
-
+    <link href="{% static 'css/colors_messages.css' %}" rel="stylesheet">
+    
 </head>
 
 <body class="bg-gradient-success">
@@ -38,6 +39,13 @@
                             <div class="text-center" >
                                 <img src="{% static 'img/logo-teschi.png' %}" alt="Logo Teschi">
                                 <h1 class="h4 text-gray-900 mb-4">Registrate!</h1>
+                                <div class="messages">
+                                    {% for message in messages %}
+                                        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
                             <form class="user" method="POST" action="{% url 'signup' %}"  onsubmit="return validarCorreo()">
                                 <div class="form-group row">
@@ -91,6 +99,15 @@
         </div>
 
     </div>
+    <script>
+        setTimeout(function() {
+            const messages = document.querySelector('.messages');
+            if (messages) {
+                messages.style.display = 'none';
+            }
+        }, 5000); // Ocultar mensajes después de 5 segundos
+    </script>
+    
     <script>
         function validarCorreo() {
             var emailInput = document.getElementById('exampleInputEmail');

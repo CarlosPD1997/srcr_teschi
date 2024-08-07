@@ -33,7 +33,7 @@
         <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'index' %}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <img src="{% static '/img/libelula.png' %}"  style="height: 50px;"/>
                 </div>
@@ -158,19 +158,42 @@
                                     </thead>
                                     
                                     <tbody>
-                                        {% for requisicion in requisiciones %}
+                                        {% for requisicion in page_obj %}
                                         <tr>
                                             <td>{{ requisicion.codigo }}</td>
                                             <td>{{ requisicion.asignatura }}</td>
                                             <td>{{ requisicion.grupo }}</td>
                                             <td>{{ requisicion.docente }}</td>
-                                            <td>{{ requisicion.fecha }}</td>
-                                            <td>{{ requisicion.inicio }}</td>
-                                            <td>{{ requisicion.fin }}</td>
+                                            <td>{{ requisicion.created_date }}</td>
+                                            <td>{{ requisicion.hora_inicio }}</td>
+                                            <td>{{ requisicion.hora_fin }}</td>
                                             <td><a href="{% url 'descargar_requisicion' requisicion.id %}" class="btn btn-primary">Descargar</a></td>
                                         </tr>
-                                    {% endfor %}
+                                        {% endfor %}
                                     </tbody>
+                                </table>
+                                
+                                <div>
+                                    <ul class="pagination align-items-center justify-content-center" style="display: flex; list-style-type: none;">
+                                        {% if page_obj.has_previous %}
+                                            <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page=1">&laquo; << </a></li>
+                                            <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ page_obj.previous_page_number }}">&lsaquo; < </a></li>
+                                        {% endif %}
+                                
+                                        {% for num in page_obj.paginator.page_range %}
+                                            {% if page_obj.number == num %}
+                                                <li style="margin-right: 5px;" class="active"><span>{{ num }}</span></li>
+                                            {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                                                <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ num }}">{{ num }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                
+                                        {% if page_obj.has_next %}
+                                            <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ page_obj.next_page_number }}"> > &rsaquo;</a></li>
+                                            <li style="margin-right: 5px;"><a href="?search={{ search_query }}&page={{ page_obj.paginator.num_pages }}"> >> &raquo;</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
                                 </table>
                             </div>
                         </div>
@@ -217,7 +240,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="{% url 'salir' %}">Logout</a>
                 </div>
             </div>
         </div>

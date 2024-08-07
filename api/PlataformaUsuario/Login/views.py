@@ -17,16 +17,16 @@ class Login(APIView):
     def post(self, request):
         username = request.POST['username']  # Asumiendo que 'username' es el campo de correo electrónico
         password = request.POST['password']
-        
-        print(f"Autenticando usuario: {username} con contraseña: {password}")
-        
         # Intentar autenticar al usuario por correo electrónico
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
-            print(f"Usuario autenticado: {user}")
             auth_login(request, user)
-            return redirect('index')
+            if user.is_superuser:
+                return redirect('utensilios')
+            else:
+                return redirect('index')
+
         else:
             print("Autenticación fallida")
             messages.error(request, 'Usuario no encontrado o credenciales inválidas')

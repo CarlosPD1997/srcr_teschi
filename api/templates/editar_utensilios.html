@@ -191,10 +191,15 @@
                                                 </table>
                                             </div>
                                             <div class="row justify-content-center">
+                                                {% if utensilio.img %}
                                                 <h2>Imagen Actual</h2>
                                                 <div class="container mt-5">
                                                     <img src="{{ utensilio.img.url}}" alt="" style="width: 500px; height: auto;">
                                                 </div>
+                                                {% else %}
+                                                <td><p>No hay imgen para mostrar</p></td>
+                                            
+                                                {% endif %}
                                                 
                                             </div>
                                             <br>

@@ -1,0 +1,40 @@
+/* Reset CSS básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Asegúrate de que todos los mensajes tengan el mismo tamaño y formato */
+.messages {
+    margin: 20px 0;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 16px; /* Asegura el mismo tamaño de fuente */
+    line-height: 1.5; /* Asegura un espaciado consistente */
+}
+
+/* Estilos específicos para tipos de mensajes */
+.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+
+.warning {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+}
+
+.error {
+    background-color: #f2dede;
+    color: #a94442;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 16px; /* Asegura el mismo tamaño de fuente */
+    line-height: 1.5; /* Asegura un espaciado consistente */
+}
