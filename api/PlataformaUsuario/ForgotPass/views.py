@@ -22,7 +22,7 @@ class ForgotPass(APIView):
             subject = 'Recuperación de Contraseña'
             html_message = render_to_string('recovery_password.html', {
                 'user': user,
-                'password': user.password  # Puedes enviar la contraseña directamente o un mensaje indicando que no se debe enviar
+                'password': user.password  
             })
             plain_message = strip_tags(html_message)
 

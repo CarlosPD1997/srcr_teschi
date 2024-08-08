@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.http import  HttpResponseRedirect
 from rest_framework.views import APIView
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
@@ -23,6 +23,7 @@ from django.contrib import messages
 from api.models import requisicion, utensilios
 import io
 from django.conf import settings
+from django.http import JsonResponse
 
 from rest_framework.views import APIView
 from django.shortcuts import render
@@ -194,12 +195,11 @@ class Index(APIView):
             )
             oficio.users.add(user)
             oficio.pdf.save(temp_file_name, temp_file)
-
-            # Redirigir a la página de creación de invoices
-            invoice_url = reverse('index')  # Asegúrate de que esta URL está definida en tu proyecto
-            return HttpResponseRedirect(invoice_url)
+            messages.success(request, 'La requisición se generó correctamente y se ha enviado el correo.')
+            return JsonResponse({'success': True, 'redirect_url': reverse('index')})
 
         except Exception as e:
             print(f'Error al generar el PDF: {str(e)}')
             messages.error(request, f'Error al generar el PDF: {str(e)}')
             return render(request, '404.html')
+        

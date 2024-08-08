@@ -50,33 +50,36 @@
                             <form class="user" method="POST" action="{% url 'signup' %}"  onsubmit="return validarCorreo()">
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="text" class="form-control form-control-user" id="FirstName"
+                                        <input type="text" class="form-control" id="FirstName"
                                             placeholder="Nombre (s)" name="FirstName">
                                     </div>
                                     <div class="col-sm-6">
-                                        <input type="text" class="form-control form-control-user" id="exampleLastName"
+                                        <input type="text" class="form-control" id="exampleLastName"
                                             placeholder="Apellidos" name="LastName">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" class="form-control form-control-user" id="exampleInputEmail"
+                                    <input type="email" class="form-control " id="exampleInputEmail"
                                         placeholder="Correo electronico" name="mail">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control form-control-user" id="exampleInputGroup"
+                                    <input type="text" class="form-control " id="exampleInputGroup"
                                         placeholder="Grupo" name="grupo">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleSelect">Selecciona tu semestre actual</label>
-                                    <select class="form-control form-control-user" id="exampleSelect" name="semester" required>
+                                    
+                                    
+                                    <select class="form-control" id="exampleFormControlSelect1" name="semester" >
+                                        <option value="">Selecciona un semestre</option>
                                         {% for semestre in semestres %}
-                                        <option value="{{ semestre.id }}" aria-placeholder="{{ semestre.semester }}" >{{ semestre.semester }}</option>
+                                            <option value="{{ semestre.id  }}">{{ semestre.semester }}</option>
                                         {% endfor %}
                                     </select>
-                                </div>
+                                    
+                                </div>	
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="password" class="form-control form-control-user"
+                                        <input type="password" class="form-control"
                                             id="exampleInputPassword" placeholder="Contraseña" name="PassWord">
                                     </div>
                                     <div class="col-sm-6">
@@ -108,21 +111,7 @@
         }, 5000); // Ocultar mensajes después de 5 segundos
     </script>
     
-    <script>
-        function validarCorreo() {
-            var emailInput = document.getElementById('exampleInputEmail');
-            var email = emailInput.value.trim();
-            var regex = /@teschi\.edu\.mx$/;
-            
-            if (!regex.test(email)) {
-                $.notify("Por favor ingresa un correo válido que termine con @teschi.edu.mx", "error");
-                return false;
-                
-            }
-            
-            return true; // Envía el formulario si la validación es correcta
-        }
-    </script>
+    
     
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>

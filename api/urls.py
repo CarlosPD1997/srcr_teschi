@@ -9,7 +9,7 @@ from .PlataformaUsuario.InfoUsuario.views import info
 from .PlataformaUsuario.History.views import History
 from .PlataformaUsuario.Salir.views import LogoutView
 from .PlataformaUsuario.Descarga.views import descargar_requisicion
-from .PlataformaUsuario.EditarRequisicion import views as edit
+from .PlataformaUsuario.EditarRequisicion.views import EditarRequisicionView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -20,7 +20,7 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('registro/', SignUp.as_view(), name='signup'),
     path('buscar_requisicion/', views.buscar_view , name='requisicion'),
-    path('editar_requisicion/<int:id>/', edit.editar_view, name='editar'),
+    path('editar_requisicion/<int:id>/', EditarRequisicionView.as_view(), name='editar'),
     path('recuperar_contraseña/', ForgotPass.as_view(), name='recuperar_pass'),
     path('historial_de_requisiciones/', History.as_view(), name='history'),
     path('cerrar_sesion/', LogoutView.as_view(), name='salir'),

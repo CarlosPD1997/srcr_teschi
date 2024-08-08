@@ -24,6 +24,7 @@
         rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/colors_messages.css' %}" rel="stylesheet">
     <style>
         .table-form {
             width: 100%;
@@ -173,7 +174,16 @@
                                 <div class="row justify-content-center">
                                     <div class="col-12 col-md-10">
                                         <h1 class="h3 mb-4 text-gray-800 text-center">Generar una requisición</h1>
-                                        <form class="user" method="POST">
+                                        <div class="messages">
+                                            {% for message in messages %}
+                                                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                            
+                                        <form class="user" method="POST" id="miFormulario">
+
                                             {% csrf_token %}
                                             <div class="table-responsive">
                                                 <table class="table table-form">
@@ -343,128 +353,159 @@
                     </div>
                     <hr>
                     
-                      
+                    
+                        
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     <script>
-                        $(document).on('click', '.add-item', function () {
-                            let row = $(this).closest('tr');
-                            let utensilioId = row.find('td#utensilio-id').text().trim();
-                            let utensilioNombre = row.find('td:eq(1)').text().trim();
-                            let cantidadExistencia = parseInt(row.find('.cantidad').text().trim());
-                            let cantidadAgregar = 1;
-
-                            if ($('#utensilios-list-add tr[data-utensilio-id="' + utensilioId + '"]').length > 0) {
-                                $.notify("Este artículo ya ha sido agregado.", "error");
-                                return;
-                            }
-
-                            if (cantidadAgregar > cantidadExistencia) {
-                                $.notify(`La cantidad a agregar no puede ser mayor a la disponibilidad: ${cantidadExistencia}. `, "warning");
-                                return;
-                            }
-
-                            if (utensilioId && utensilioNombre) {
-                                console.log(`Agregando utensilio: ID=${utensilioId}, Nombre=${utensilioNombre}, Existencia=${cantidadExistencia}`);
-
-                                let index = $('#utensilios-list-add tr').length;
-                                let newRow = `
-                                    <tr data-utensilio-id="${utensilioId}" data-existencia="${cantidadExistencia}">
-                                        <td><input type="text" class="form-control form-control-user text-center" name="utensilios[${index}][id]" value="${utensilioId}" readonly></td>
-                                        <td><input type="text" class="form-control form-control-user" value="${utensilioNombre}" name="utensilios[${index}][nombre]" readonly></td>
-                                        <td><input type="text" class="form-control text-center" value="${cantidadExistencia}" name="utensilios[${index}][cantidad_maxima]" readonly></td> <!-- Campo para la cantidad máxima -->
-                                        <td>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text decrement">-</span>
-                                                </div>
-                                                <input type="text" class="form-control text-center cantidad" name="utensilios[${index}][cantidad]" value="1" max="${cantidadExistencia}" readonly>
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text increment">+</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><button type="button" class="btn btn-danger remove-item">Eliminar</button></td>
-                                    </tr>
-                                `;
-                                $('#utensilios-list-add').append(newRow);
-                                saveDataToSession();
-                            }
-                        });
-
-                        $(document).on('click', '.increment', function () {
-                            let input = $(this).closest('.input-group').find('.cantidad');
-                            let cantidadExistencia = parseInt($(this).closest('tr').data('existencia'));
-                            let cantidadActual = parseInt(input.val());
-
-                            if (cantidadActual < cantidadExistencia) {
-                                input.val(cantidadActual + 1);
-                                saveDataToSession();
-                            } else {
-                                $.notify(`La cantidad no puede ser mayor a la disponibilidad: ${cantidadExistencia}. `, "warning");
-                            }
-                        });
-
-                        $(document).on('click', '.decrement', function () {
-                            let input = $(this).closest('.input-group').find('.cantidad');
-                            let cantidadActual = parseInt(input.val());
-
-                            if (cantidadActual > 1) {
-                                input.val(cantidadActual - 1);
-                                saveDataToSession();
-                            }
-                        });
-
-                        $(document).on('click', '.remove-item', function () {
-                            let row = $(this).closest('tr');
-                            row.remove();
-                            saveDataToSession();
-                        });
-
-                        function saveDataToSession() {
-                            let utensilios = [];
-                            $('#utensilios-list-add tr').each(function() {
-                                let utensilio = {
-                                    id: $(this).data('utensilio-id'),
-                                    nombre: $(this).find('input[name$="[nombre]"]').val(),
-                                    cantidadmax: $(this).find('input[name$="[cantidad_maxima]"]').val(),
-                                    cantidad: $(this).find('.cantidad').val(),
-                                };
-                                utensilios.push(utensilio);
-                            });
-                            sessionStorage.setItem('utensilios', JSON.stringify(utensilios));
-                        }
-
-                        function restoreDataFromSession() {
-                            let utensilios = JSON.parse(sessionStorage.getItem('utensilios')) || [];
-                            $('#utensilios-list-add').empty();
-                            utensilios.forEach(function(utensilio, index) {
-                                let newRow = `
-                                    <tr data-utensilio-id="${utensilio.id}" data-existencia="${utensilio.cantidadmax}">
-                                        <td><input type="text" class="form-control form-control-user text-center" name="utensilios[${index}][id]" value="${utensilio.id}" readonly></td>
-                                        <td><input type="text" class="form-control form-control-user" value="${utensilio.nombre}" name="utensilios[${index}][nombre]" readonly></td>
-                                        <td><input type="text" class="form-control text-center" value="${utensilio.cantidadmax}" name="utensilios[${index}][cantidad_maxima]" readonly></td>
-                                        <td>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text decrement">-</span>
-                                                </div>
-                                                <input type="text" class="form-control text-center cantidad" name="utensilios[${index}][cantidad]" value="${utensilio.cantidad}" readonly>
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text increment">+</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><button type="button" class="btn btn-danger remove-item">Eliminar</button></td>
-                                    </tr>
-                                `;
-                                $('#utensilios-list-add').append(newRow);
-                            });
-                        }
-
                         $(document).ready(function() {
-                            restoreDataFromSession();
-                        });
+    restoreDataFromSession();
+
+    // Enviar el formulario mediante AJAX
+    $('#miFormulario').on('submit', function(event) {
+        event.preventDefault(); // Evita el envío normal del formulario
+
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    // Limpia la tabla y el almacenamiento de la sesión
+                    $('#utensilios-list-add').empty();
+                    sessionStorage.removeItem('utensilios');
+                    $.notify("La requisición se generó correctamente y se ha enviado el correo.", "success");
+
+                    // Redirige al usuario a la URL de redirección
+                    window.location.href = response.redirect_url;
+                } else {
+                    $.notify(`Error al generar el PDF: ${response.error}`, "error");
+                }
+            },
+            error: function() {
+                $.notify("Hubo un error en la solicitud.", "error");
+            }
+        });
+    });
+
+});
+
+$(document).on('click', '.add-item', function () {
+    let row = $(this).closest('tr');
+    let utensilioId = row.find('td#utensilio-id').text().trim();
+    let utensilioNombre = row.find('td:eq(1)').text().trim();
+    let cantidadExistencia = parseInt(row.find('.cantidad').text().trim());
+    let cantidadAgregar = 1;
+
+    if ($('#utensilios-list-add tr[data-utensilio-id="' + utensilioId + '"]').length > 0) {
+        $.notify("Este artículo ya ha sido agregado.", "error");
+        return;
+    }
+
+    if (cantidadAgregar > cantidadExistencia) {
+        $.notify(`La cantidad a agregar no puede ser mayor a la disponibilidad: ${cantidadExistencia}. `, "warning");
+        return;
+    }
+
+    if (utensilioId && utensilioNombre) {
+        console.log(`Agregando utensilio: ID=${utensilioId}, Nombre=${utensilioNombre}, Existencia=${cantidadExistencia}`);
+
+        let index = $('#utensilios-list-add tr').length;
+        let newRow = `
+            <tr data-utensilio-id="${utensilioId}" data-existencia="${cantidadExistencia}">
+                <td><input type="text" class="form-control form-control-user text-center" name="utensilios[${index}][id]" value="${utensilioId}" readonly></td>
+                <td><input type="text" class="form-control form-control-user" value="${utensilioNombre}" name="utensilios[${index}][nombre]" readonly></td>
+                <td><input type="text" class="form-control text-center" value="${cantidadExistencia}" name="utensilios[${index}][cantidad_maxima]" readonly></td>
+                <td>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text decrement">-</span>
+                        </div>
+                        <input type="text" class="form-control text-center cantidad" name="utensilios[${index}][cantidad]" value="1" max="${cantidadExistencia}" readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text increment">+</span>
+                        </div>
+                    </div>
+                </td>
+                <td><button type="button" class="btn btn-danger remove-item">Eliminar</button></td>
+            </tr>
+        `;
+        $('#utensilios-list-add').append(newRow);
+        saveDataToSession();
+    }
+});
+
+$(document).on('click', '.increment', function () {
+    let input = $(this).closest('.input-group').find('.cantidad');
+    let cantidadExistencia = parseInt($(this).closest('tr').data('existencia'));
+    let cantidadActual = parseInt(input.val());
+
+    if (cantidadActual < cantidadExistencia) {
+        input.val(cantidadActual + 1);
+        saveDataToSession();
+    } else {
+        $.notify(`La cantidad no puede ser mayor a la disponibilidad: ${cantidadExistencia}. `, "warning");
+    }
+});
+
+$(document).on('click', '.decrement', function () {
+    let input = $(this).closest('.input-group').find('.cantidad');
+    let cantidadActual = parseInt(input.val());
+
+    if (cantidadActual > 1) {
+        input.val(cantidadActual - 1);
+        saveDataToSession();
+    }
+});
+
+$(document).on('click', '.remove-item', function () {
+    let row = $(this).closest('tr');
+    row.remove();
+    saveDataToSession();
+});
+
+function saveDataToSession() {
+    let utensilios = [];
+    $('#utensilios-list-add tr').each(function() {
+        let utensilio = {
+            id: $(this).data('utensilio-id'),
+            nombre: $(this).find('input[name$="[nombre]"]').val(),
+            cantidadmax: $(this).find('input[name$="[cantidad_maxima]"]').val(),
+            cantidad: $(this).find('.cantidad').val(),
+        };
+        utensilios.push(utensilio);
+    });
+    sessionStorage.setItem('utensilios', JSON.stringify(utensilios));
+}
+
+function restoreDataFromSession() {
+    let utensilios = JSON.parse(sessionStorage.getItem('utensilios')) || [];
+    $('#utensilios-list-add').empty();
+    utensilios.forEach(function(utensilio, index) {
+        let newRow = `
+            <tr data-utensilio-id="${utensilio.id}" data-existencia="${utensilio.cantidadmax}">
+                <td><input type="text" class="form-control form-control-user text-center" name="utensilios[${index}][id]" value="${utensilio.id}" readonly></td>
+                <td><input type="text" class="form-control form-control-user" value="${utensilio.nombre}" name="utensilios[${index}][nombre]" readonly></td>
+                <td><input type="text" class="form-control text-center" value="${utensilio.cantidadmax}" name="utensilios[${index}][cantidad_maxima]" readonly></td>
+                <td>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text decrement">-</span>
+                        </div>
+                        <input type="text" class="form-control text-center cantidad" name="utensilios[${index}][cantidad]" value="${utensilio.cantidad}" readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text increment">+</span>
+                        </div>
+                    </div>
+                </td>
+                <td><button type="button" class="btn btn-danger remove-item">Eliminar</button></td>
+            </tr>
+        `;
+        $('#utensilios-list-add').append(newRow);
+    });
+}
+
                         </script>
+                        
 
 
                

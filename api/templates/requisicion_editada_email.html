@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Requisición Editada</title>
+</head>
+<body>
+    <p>Hola {{ requisicion.usuario.username }},</p>
+    <p>La requisición con ID {{ requisicion.id }} ha sido editada exitosamente.</p>
+    <p>Aquí están los detalles actualizados:</p>
+    <ul>
+        {% for item in requisicion.items.all %}
+            <li>{{ item.nombre }} - Cantidad: {{ item.cantidad }}</li>
+        {% endfor %}
+    </ul>
+    <p>Adjunto encontrarás el PDF con los detalles de la requisición editada.</p>
+</body>
+</html>

@@ -310,7 +310,7 @@
                                                         <tr data-utensilio-id="{{ utensilio.id }}" data-existencia="{{ utensilio.cantidad_maxima }}">
                                                             <td><input  class="form-control form-control-user text-center" value="{{ utensilio.id }}" name="utensilios[{{ forloop.counter0 }}][id]" readonly></td>
                                                             <td><input type="text" class="form-control form-control-user" value="{{ utensilio.nombre }}" name="utensilios[{{ forloop.counter0 }}][nombre]" readonly></td>
-                                                            <td><input type="text" class="form-control text-center" value="{{ utensilio.cantidad_maxima }}" readonly></td>
+                                                            <td><input type="text" class="form-control text-center" value="{{ utensilio.cantidad_maxima }}" name="utensilios[{{ forloop.counter0 }}][cantidad_maxima]" readonly></td>
                                                             <td>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
@@ -366,6 +366,37 @@
                       
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     <script>
+                            $(document).ready(function() {
+                                restoreDataFromSession();
+
+                                // Enviar el formulario mediante AJAX
+                                $('#miFormulario').on('submit', function(event) {
+                                    event.preventDefault(); // Evita el envío normal del formulario
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: $(this).attr('action'),
+                                        data: $(this).serialize(),
+                                        success: function(response) {
+                                            if (response.success) {
+                                                // Limpia la tabla y el almacenamiento de la sesión
+                                                $('#utensilios-list-add').empty();
+                                                sessionStorage.removeItem('utensilios');
+                                                $.notify("La requisición se generó correctamente y se ha enviado el correo.", "success");
+
+                                                // Redirige al usuario a la URL de redirección
+                                                window.location.href = response.redirect_url;
+                                            } else {
+                                                $.notify(`Error al generar el PDF: ${response.error}`, "error");
+                                            }
+                                        },
+                                        error: function() {
+                                            $.notify("Hubo un error en la solicitud.", "error");
+                                        }
+                                    });
+                                });
+
+                            });
                         $(document).on('click', '.add-item', function () {
                             let row = $(this).closest('tr');
                             let utensilioId = row.find('td#utensilio-id').text().trim();
