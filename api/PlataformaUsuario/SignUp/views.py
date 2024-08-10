@@ -45,7 +45,7 @@ class SignUp(APIView):
             user.set_password(password)
             user.full_clean()  
             user.save()
-            print("registrado")
+           
 
             # Configuración del correo electrónico
             subject = 'Bienvenido!'

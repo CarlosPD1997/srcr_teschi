@@ -10,6 +10,9 @@ from .Usuarios.DeleteUser.views import delete_users
 from .Usuarios.Agregar.views import AddUser
 from .Historial.views import History
 from .InfoUsuario.views import info
+from .Talleres.views import registrarTalleres
+from .Talleres.Eliminar.views import eliminar_taller
+from .Talleres.Editar.views import EditarTallerView
 
 urlpatterns = [
     #Path utensilios
@@ -25,6 +28,11 @@ urlpatterns = [
     path('admin/historial_requisiciones', History.as_view(), name='HistoryAdmn'), 
     #Info user path
     path('admin/info_usuario', info.as_view(), name='adminfo'), 
+    #Talleres y Materias Path
+    path('admin/agregar_talleres/', registrarTalleres.as_view(), name='talleres'),
+    path('admin/talleres/editar/<int:taller_id>/', EditarTallerView.as_view(), name='editar_taller'),
+    path('admin/talleres/eliminar/<int:taller_id>/', eliminar_taller, name='eliminar_taller'),
+
 
 ] 
 

@@ -6,15 +6,8 @@ class Semester(models.Model):
     semester = models.CharField(max_length=30)
 
     class Meta:
-        db_table = 'semester'  # Nombre de la tabla en la base de datos
+        db_table = 'Semestre'  # Nombre de la tabla en la base de datos
 
-class Classes(models.Model):
-    id = models.AutoField(primary_key=True)
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        db_table = 'classes'  # Nombre de la tabla en la base de datos
 
 class Users(AbstractUser):
     id = models.AutoField(primary_key=True)
@@ -26,10 +19,29 @@ class Users(AbstractUser):
     # Ajustando related_name para evitar conflictos
 
     class Meta:
-        db_table = 'users'  # Nombre de la tabla en la base de datos
+        db_table = 'Usuario'  # Nombre de la tabla en la base de datos
 
 Users.groups.field.remote_field.related_name = 'users_groups'
 Users.user_permissions.field.remote_field.related_name = 'users_permissions'
+
+class Classes(models.Model):
+    id = models.AutoField(primary_key=True)
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    users = models.ManyToManyField(Users, related_name='materia_usuario')
+    
+    class Meta:
+        db_table = 'Materia'  # Nombre de la tabla en la base de datos
+
+class Talleres(models.Model):
+    id = models.AutoField(primary_key=True)
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    users = models.ManyToManyField(Users, related_name='taller_usuario')
+    
+    class Meta:
+        db_table = 'Taller'  # Nombre de la tabla en la base de datos
+
 
 class requisicion(models.Model):  # Asegúrate de que el nombre de la clase empiece con mayúscula
     id = models.AutoField(primary_key=True)
@@ -49,7 +61,7 @@ class requisicion(models.Model):  # Asegúrate de que el nombre de la clase empi
         return f"Requisicion {self.id}"
 
     class Meta:
-        db_table = 'requisiciones'  # Nombre de la tabla en la base de datos
+        db_table = 'Requisicion'  # Nombre de la tabla en la base de datos
 
 class utensilios(models.Model):  # Asegúrate de que el nombre de la clase empiece con mayúscula
     id = models.AutoField(primary_key=True)
@@ -58,6 +70,12 @@ class utensilios(models.Model):  # Asegúrate de que el nombre de la clase empie
     descripcion = models.CharField(max_length=200)
     tamaño = models.CharField(max_length=200)
     img = models.ImageField(upload_to='img/', default='img/vaporera.jpg', null=True)
+    solicitudes = models.IntegerField(default=0)
 
     class Meta:
-        db_table = 'utensilios'  # Nombre de la tabla en la base de datos
+        db_table = 'Utensilio'  # Nombre de la tabla en la base de datos
+
+    def incrementar_solicitud(self):
+        """Incrementa el contador de solicitudes en 1 y guarda el cambio."""
+        self.solicitudes += 1
+        self.save()  # Guarda los cambios en la base de datos
