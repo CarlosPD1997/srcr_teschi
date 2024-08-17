@@ -46,7 +46,18 @@ class Talleres(models.Model):
 class requisicion(models.Model):  # Asegúrate de que el nombre de la clase empiece con mayúscula
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=10)
-    asignatura = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True)
+    asignatura = models.ForeignKey(
+        'Classes', 
+        on_delete=models.CASCADE, 
+        null=True,
+        related_name='requisiciones_asignatura'  # Unique related_name for this ForeignKey
+    )
+    taller = models.ForeignKey(
+        'Talleres', 
+        on_delete=models.CASCADE, 
+        null=True,
+        related_name='requisiciones_taller'  # Unique related_name for this ForeignKey
+    )
     hora_inicio = models.CharField(max_length=100)
     hora_fin = models.CharField(max_length=100)
     docente = models.CharField(max_length=100)

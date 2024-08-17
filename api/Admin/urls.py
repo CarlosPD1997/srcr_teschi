@@ -13,6 +13,7 @@ from .InfoUsuario.views import info
 from .Talleres.views import registrarTalleres
 from .Talleres.Eliminar.views import eliminar_taller
 from .Talleres.Editar.views import EditarTallerView
+from .Dashboard.views import DashboardView
 
 urlpatterns = [
     #Path utensilios
@@ -32,6 +33,8 @@ urlpatterns = [
     path('admin/agregar_talleres/', registrarTalleres.as_view(), name='talleres'),
     path('admin/talleres/editar/<int:taller_id>/', EditarTallerView.as_view(), name='editar_taller'),
     path('admin/talleres/eliminar/<int:taller_id>/', eliminar_taller, name='eliminar_taller'),
+    # Dashboard view
+    path('admin/dashboard/', DashboardView.as_view(), name='dashboard'),
 
 
 ] 

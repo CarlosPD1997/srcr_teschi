@@ -44,6 +44,19 @@
             justify-content: center;
             align-items: center;
         }
+        .nav-item ul {
+            display: none; /* Ocultar submenús por defecto */
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .nav-item.active > ul {
+            display: block; /* Mostrar submenú cuando el elemento está activo */
+        }
+
+        .nav-link {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -69,20 +82,39 @@
                 Herramientas
             </div>
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'index' %}">
+            <li class="nav-item">
+                <a class="nav-link" id="toggle-menu" href="#">
                     <i class="fas fa-fw fa-receipt"></i>
-                    <span>Requisición</span></a>
+                    <span>Utensilios</span>
+                </a>
+                <ul>
+                    <li>
+                        <a class="nav-link" href="{% url 'utensilios' %}">
+                            <i class="fas fa-fw fa-plus"></i>
+                            <span>Administrar Utensilios</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios' %}">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span>Ver usuarios</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'add_usuarios' %}">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span>Agregar usuarios</span></a>
             </li>
             <li class="nav-item ">
-                <a class="nav-link" href="{% url 'requisicion' %}">
-                    <i class="fas fa-fw fa-file-pdf"></i>
-                    <span>Editar Requisición</span></a>
-            </li>
-            <li class="nav-item ">
-                <a class="nav-link" href="{% url 'history' %}">
+                <a class="nav-link" href="{% url 'HistoryAdmn' %}">
                     <i class="fas fa-fw fa-folder"></i>
                     <span>Historial</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'talleres' %}">
+                    <i class="fas fa-fw fa-receipt"></i>
+                    <span>Talleres</span></a>
             </li>
 
             <!-- Divider -->
