@@ -51,8 +51,7 @@ class AddUser(View):
         form = UserForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_superuser = form.cleaned_data['is_superuser']
-            user.is_staff = form.cleaned_data['is_staff']
+            user.is_superuser = 1
             user.save()
             
             messages.success(request, 'El usuario se ha creado exitosamente.')  # Mensaje de éxito

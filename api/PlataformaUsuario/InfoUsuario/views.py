@@ -12,7 +12,7 @@ class UserForm(forms.ModelForm):
                   'last_name', 
                   'email', 
                   'profile_photo', 
-                  
+                  'matricula',
                   'grupo'
                   ]
 

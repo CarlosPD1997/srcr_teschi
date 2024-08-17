@@ -22,10 +22,15 @@ class SignUp(APIView):
         semester_id = request.POST['semester']
         password = request.POST['PassWord']
         repeat_password = request.POST['RepeatPass']
+        matricula = request.POST['matricula']
 
         # Verifica si el usuario ya existe
         if Users.objects.filter(email=email).exists():
             messages.warning(request, 'Error. Este correo ya está registrado.')
+            return render(request, 'register.html')
+        
+        if Users.objects.filter(matricula=matricula).exists():
+            messages.warning(request, 'Error. Esta matrocula ya está registrada.')
             return render(request, 'register.html')
 
         if password != repeat_password:
@@ -40,7 +45,8 @@ class SignUp(APIView):
                 last_name=lastName,
                 grupo=grupo,
                 semester=semester,
-                username=email
+                username=email,
+                matricula=matricula
             )
             user.set_password(password)
             user.full_clean()  

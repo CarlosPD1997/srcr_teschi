@@ -15,6 +15,7 @@ class Users(AbstractUser):
     profile_photo = models.ImageField(upload_to='img/', default='img/profile.jpg')
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, default=1)
     grupo = models.CharField(max_length=20, default='0')
+    matricula = models.CharField(max_length=10, default='0', unique=True)
    
     # Ajustando related_name para evitar conflictos
 

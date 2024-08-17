@@ -23,7 +23,7 @@ class Login(APIView):
         if user is not None:
             auth_login(request, user)
             if user.is_superuser:
-                return redirect('utensilios')
+                return redirect('dashboard')
             else:
                 return redirect('index')
 
