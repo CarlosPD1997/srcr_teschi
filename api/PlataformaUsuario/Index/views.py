@@ -10,7 +10,6 @@ from .codigo import generar_codigo_unico
 from api.models import utensilios
 from django.core.paginator import Paginator
 from django.urls import reverse
-from django.http import  HttpResponseRedirect
 from rest_framework.views import APIView
 from django.shortcuts import render, redirect
 from reportlab.lib.pagesizes import letter
@@ -27,7 +26,6 @@ from django.http import JsonResponse
 
 from rest_framework.views import APIView
 from django.shortcuts import render
-from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib import colors
@@ -68,29 +66,33 @@ class Index(APIView):
             asignatura = request.POST.get('asignatura')
             taller = request.POST.get('taller')
 
-            utensilios = []
+            utensilios_list = []
             for key, value in request.POST.items():
                 if key.startswith('utensilios'):
                     parts = key.split('[')
                     index = int(parts[1][:-1])
                     field = parts[2][:-1]
 
-                    while len(utensilios) <= index:
-                        utensilios.append({})
+                    while len(utensilios_list) <= index:
+                        utensilios_list.append({})
 
-                    utensilios[index][field] = value
+                    utensilios_list[index][field] = value
 
-            utensilios_finales = [
-                {
-                    'id': u.get('id', ''),
-                    'nombre': u.get('nombre', ''),
-                    'cantidad_maxima': u.get('cantidad_maxima', ''),
-                    'cantidad': u.get('cantidad', '')
-                }
-                for u in utensilios if 'nombre' in u and 'cantidad' in u
-            ]
+            utensilios_finales = []
+            for u in utensilios_list:
+                if 'nombre' in u and 'cantidad' in u:
+                    utensilio_id = u.get('id', '')
+                    utensilio = utensilios.objects.get(id=utensilio_id)
+                    print(utensilio_id)
+                    utensilio.incrementar_solicitud()
+                    utensilios_finales.append({
+                        'id': utensilio.id,
+                        'nombre': utensilio.nombre,
+                        'cantidad_maxima': utensilio.cantidad,
+                        'cantidad': u['cantidad']
+                    })
 
-            # Generación del PDF
+            # Generación del PDF (sigue igual)
             buffer = io.BytesIO()
             doc = SimpleDocTemplate(buffer, pagesize=letter)
             elements = []
@@ -120,9 +122,9 @@ class Index(APIView):
 
             utensilios_data = [
                 ["NOMBRE \n DE \n UTENSILIOS", 
-                 "CANTIDAD \n REQUERIDA \n  POR EL \n ESTUDIANTE", 
-                 "CANTIDAD \n ENTREGADA \n POR EL ALMACÉN", 
-                 "CANTIDAD \n RECIBIDA \n POR \n ENCARGADO \n DEL \n ALMACÉN Y \n ENCARGADO \n DE ÁREA"],
+                "CANTIDAD \n REQUERIDA \n  POR EL \n ESTUDIANTE", 
+                "CANTIDAD \n ENTREGADA \n POR EL ALMACÉN", 
+                "CANTIDAD \n RECIBIDA \n POR \n ENCARGADO \n DEL \n ALMACÉN Y \n ENCARGADO \n DE ÁREA"],
             ]
             for utensilio in utensilios_finales:
                 utensilios_data.append([utensilio['nombre'], utensilio['cantidad'], "", ""])
@@ -163,7 +165,7 @@ class Index(APIView):
             html_message = render_to_string('requisicion_email.html', {'user': user})
             plain_message = 'Adjunto encontrarás el PDF de la requisición de utensilios que solicitaste.'  # Mensaje de texto plano
             from_email = settings.EMAIL_HOST_USER
-            to_email = ['almacenteschi2024@gmail.com']
+            to_email = [user.email]
 
             # Crear el EmailMessage para enviar el correo con el PDF adjunto
             email = EmailMessage(
@@ -202,4 +204,5 @@ class Index(APIView):
             print(f'Error al generar el PDF: {str(e)}')
             messages.error(request, f'Error al generar el PDF: {str(e)}')
             return render(request, '404.html')
-        
+
+            
