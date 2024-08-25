@@ -1,7 +1,6 @@
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib import colors
-from datetime import datetime
 from api.models import requisicion
 from django.contrib import messages
 import io
@@ -33,7 +32,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import send_mail  # Importa send_mail
 from django.template.loader import render_to_string
 from django.contrib import messages
-from api.models import requisicion, utensilios
+from api.models import requisicion, utensilios, Talleres, Classes
 import io
 
 class Index(APIView):
@@ -42,7 +41,9 @@ class Index(APIView):
     def get(self, request):
         utensilios_list = utensilios.objects.all()
         search_query = request.GET.get('search', '')
-        
+        talleres = Talleres.objects.all()
+        asignaturas = Classes.objects.all()
+
         if search_query:
             utensilios_list = utensilios.objects.filter(nombre__icontains=search_query)
         
@@ -52,8 +53,10 @@ class Index(APIView):
 
         return render(request, self.template_name, {
             'page_obj': page_obj,
-            'search_query': search_query 
-        })
+            'search_query': search_query,
+            'asginaturas': asignaturas,
+            'talleres': talleres
+            })
     
     def post(self, request):
         try:
