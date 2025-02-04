@@ -32,7 +32,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import send_mail  # Importa send_mail
 from django.template.loader import render_to_string
 from django.contrib import messages
-from api.models import requisicion, utensilios, Talleres, Classes
+from api.models import requisicion, utensilios, Talleres, Classes, RequisicionItem
 import io
 
 class Index(APIView):
@@ -60,6 +60,7 @@ class Index(APIView):
     
     def post(self, request):
         try:
+            codigo_unico = generar_codigo_unico()
             user = request.user
             grupo = request.POST.get('grupo')
             inicio = request.POST.get('inicio')
@@ -86,14 +87,19 @@ class Index(APIView):
                 if 'nombre' in u and 'cantidad' in u:
                     utensilio_id = u.get('id', '')
                     utensilio = utensilios.objects.get(id=utensilio_id)
-                    print(utensilio_id)
+                    
+                    # Aquí le asignas un estado por defecto a cada utensilio
+                    utensilio.estado = 'no_entregado'  # Estado por defecto al crear la requisición
+                    
                     utensilio.incrementar_solicitud()
                     utensilios_finales.append({
                         'id': utensilio.id,
                         'nombre': utensilio.nombre,
                         'cantidad_maxima': utensilio.cantidad,
-                        'cantidad': u['cantidad']
+                        'cantidad': u['cantidad'],
                     })
+                    
+                    
 
             # Generación del PDF (sigue igual)
             buffer = io.BytesIO()
@@ -186,7 +192,7 @@ class Index(APIView):
             # Guarda el PDF en el modelo si es necesario
             temp_file = ContentFile(pdf_content)
             temp_file_name = f"Requisicion_{fecha}.pdf"
-            codigo_unico = generar_codigo_unico()
+            
 
             oficio = requisicion.objects.create(
                 codigo=codigo_unico,
@@ -197,7 +203,21 @@ class Index(APIView):
                 created_date=fecha,
                 docente=docente,
                 items=utensilios_finales,
+                taller_id = taller
             )
+            for u in utensilios_list:
+                if 'nombre' in u and 'cantidad' in u:
+                    utensilio_id = u.get('id', '')
+                    utensilio = utensilios.objects.get(id=utensilio_id)
+                    
+                    # Aquí le asignas un estado por defecto a cada utensilio
+                    utensilio.estado = 'no_entregado'  # Estado por defecto al crear la requisición
+                    
+                    requisicion_item = RequisicionItem.objects.create(
+                    requisicion=oficio,
+                    item_id=utensilio.id,
+                    estado=utensilio.estado,  # Estado predeterminado
+                    )
             oficio.users.add(user)
             oficio.pdf.save(temp_file_name, temp_file)
             messages.success(request, 'La requisición se generó correctamente y se ha enviado el correo.')

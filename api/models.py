@@ -66,6 +66,7 @@ class requisicion(models.Model):  # Asegúrate de que el nombre de la clase empi
     pdf = models.FileField(upload_to='pdf/')
     users = models.ManyToManyField(Users)
     created_date = models.DateField(auto_now_add=True)
+
     
     items = models.JSONField()
 
@@ -74,6 +75,28 @@ class requisicion(models.Model):  # Asegúrate de que el nombre de la clase empi
 
     class Meta:
         db_table = 'Requisicion'  # Nombre de la tabla en la base de datos
+
+class RequisicionItem(models.Model):
+    requisicion = models.ForeignKey(requisicion, related_name="items_estado", on_delete=models.CASCADE)
+    item_id = models.CharField(max_length=100)  # ID del item en la lista de la requisición
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('entregado', 'Entregado'),
+            ('no_entregado', 'No Entregado'),
+            ('danado', 'Dañado'),
+            ('perdido', 'Perdido')
+        ],
+        default='no_entregado'
+    )
+    observaciones = models.TextField(null=True, blank=True)  # Opcional, para registrar comentarios adicionales
+    
+    def __str__(self):
+        return f"Estado del item {self.item_id} de la requisición {self.requisicion.id}"
+
+    class Meta:
+        db_table = 'RequisicionItem'
+
 
 class utensilios(models.Model):  # Asegúrate de que el nombre de la clase empiece con mayúscula
     id = models.AutoField(primary_key=True)
@@ -91,3 +114,13 @@ class utensilios(models.Model):  # Asegúrate de que el nombre de la clase empie
         """Incrementa el contador de solicitudes en 1 y guarda el cambio."""
         self.solicitudes += 1
         self.save()  # Guarda los cambios en la base de datos
+
+
+class desechos(models.Model):
+    id = models.AutoField(primary_key=True)
+    litros = models.IntegerField()
+    taller = models.ForeignKey(Talleres, on_delete=models.CASCADE,  related_name='desecho_taller')
+    date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'Desechos'  # Nombre de la tabla en la base de datos

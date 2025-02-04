@@ -245,16 +245,21 @@
                                     <canvas id="requisiciones3DiasChart"></canvas>
                                 </div>
 
+                                <div class="chart-container">
+                                    <h2>Talleres que más solicitan aceite</h2>
+                                    <canvas id="talleresAceiteChart"></canvas>
+                                </div>
+
                                 <script>
                                     // Datos de Talleres
-                                    var ctxTalleres = document.getElementById('talleresChart').getContext('2d');
-                                    new Chart(ctxTalleres, {
+                                    var ctxRequisiciones = document.getElementById('talleresChart').getContext('2d');
+                                    new Chart(ctxRequisiciones, {
                                         type: 'bar',
                                         data: {
-                                            labels: [{% for data in talleres_data %}"{{ data.taller }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+                                            labels: [{% for data in talleres_data %}"{{ data.taller }}" {% if not forloop.last %}, {% endif %}{% endfor %}],
                                             datasets: [{
                                                 label: 'Número de requisiciones',
-                                                data: [{% for data in talleres_data %}{{ data.requisiciones }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                                                data: [{% for data in talleres_data %}{{ data.requisiciones_count }}{% if not forloop.last %},{% endif %}{% endfor %}],
                                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                                 borderColor: 'rgba(75, 192, 192, 1)',
                                                 borderWidth: 1
@@ -320,6 +325,26 @@
                                                 data: [{% for requisicion in requisiciones_ultimos_3_dias %}1{% if not forloop.last %},{% endif %}{% endfor %}],
                                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                                 borderColor: 'rgba(255, 99, 132, 1)',
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            scales: {
+                                                y: { beginAtZero: true }
+                                            }
+                                        }
+                                    });
+                                    // Datos de Talleres que más solicitan aceite
+                                    var ctxAceite = document.getElementById('talleresAceiteChart').getContext('2d');
+                                    new Chart(ctxAceite, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: [{% for data in aceite_data %}"{{ data.taller }}" {% if not forloop.last %}, {% endif %}{% endfor %}],
+                                            datasets: [{
+                                                label: 'Cantidad de aceite solicitado (litros)',
+                                                data: [{% for data in aceite_data %}{{ data.cantidad_aceite }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                                                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                                borderColor: 'rgba(255, 159, 64, 1)',
                                                 borderWidth: 1
                                             }]
                                         },

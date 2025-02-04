@@ -14,6 +14,7 @@ from .Talleres.views import registrarTalleres
 from .Talleres.Eliminar.views import eliminar_taller
 from .Talleres.Editar.views import EditarTallerView
 from .Dashboard.views import DashboardView
+from .Validar.views import ValidarRequisicionView
 
 urlpatterns = [
     #Path utensilios
@@ -35,6 +36,7 @@ urlpatterns = [
     path('admin/talleres/eliminar/<int:taller_id>/', eliminar_taller, name='eliminar_taller'),
     # Dashboard view
     path('admin/dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('admin/validar_requisicion/<int:id>/', ValidarRequisicionView.as_view(), name='validar_requisicion'),
 
 
 ] 

@@ -224,6 +224,7 @@
                                             <th>Inicio</th>
                                             <th>Fin</th>
                                             <th>Documento</th>
+                                            <th>Validar</th>
                                         </tr>
                                     </thead>
                                     
@@ -238,6 +239,7 @@
                                             <td>{{ requisicion.hora_inicio }}</td>
                                             <td>{{ requisicion.hora_fin }}</td>
                                             <td><a href="{% url 'descargar_requisicion' requisicion.id %}" class="btn btn-primary">Descargar</a></td>
+                                            <td><a href="{% url 'validar_requisicion' requisicion.id %}" class="btn btn-success">Validar</a></td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
