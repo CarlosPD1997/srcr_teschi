@@ -81,10 +81,10 @@ WSGI_APPLICATION = 'srcr.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'srcr_db',                      # Nombre de la base de datos
-        'USER': 'srcr_db_user',                 # Usuario de la base de datos
-        'PASSWORD': 'vOrWHISEfb5WQRldpkcZLNf6T62VYGfX',  # Contraseña del usuario
-        'HOST': 'dpg-cufvo55ds78s73fpucmg-a.oregon-postgres.render.com',  # Host del servidor PostgreSQL
+        'NAME': 'srcr_db_9ne7',                      # Nombre de la base de datos
+        'USER': 'srcr_db_9ne7_user',                 # Usuario de la base de datos
+        'PASSWORD': '3n20tZYRuvgNeXz0qKK0QFLoydDxo7xw',  # Contraseña del usuario
+        'HOST': 'dpg-d4rtsup5pdvs73br6hm0-a.oregon-postgres.render.com',  # Host del servidor PostgreSQL
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',  # Asegúrate de incluir esta línea
